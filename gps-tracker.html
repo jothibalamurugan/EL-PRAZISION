@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Tracker</title>
+    <script>
+        function getEmailFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("email") || "unknown@example.com"; 
+        }
+
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    var email = getEmailFromURL(); 
+
+                    var data = JSON.stringify({
+                        "email": email,
+                        "latitude": latitude,
+                        "longitude": longitude
+                    });
+
+                    fetch("https://script.google.com/macros/s/AKfycbxwJFMdboFrdxwhcaV3fsh3jhc0bCSW0sVPoir8n5GjIlGZcOF3ipKk6hbB2zj-7evB/exec", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: data
+                    })
+                    .then(response => response.text())
+                    .then(result => console.log("Location sent: " + result))
+                    .catch(error => console.error("Error:", error));
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        setInterval(sendLocation, 1800000); 
+        window.onload = sendLocation; 
+    </script>
+</head>
+<body>
+    <h2>GPS Tracking Active</h2>
+    <p>This page is tracking your location every 30 minutes.</p>
+</body>
+</html>
